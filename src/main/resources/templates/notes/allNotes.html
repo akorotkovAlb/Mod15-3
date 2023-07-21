@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1 th:text="'Notes count: ' + ${notes.size()}"></h1>
+
+<div th:each="note : ${notes}">
+        <div th:text="'id: ' + ${note.id}"></div>
+        <div th:text="'Title: ' + ${note.title}"></div>
+        <div th:text="'Content: ' + ${note.content}"></div>
+</div>
+
+<form action="/V1/notes/create" method="post">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" name="title" id="title"/>
+    </div>
+
+    <div>
+        <label for="content">Content:</label>
+        <textarea name="content" id="content" cols="30" rows="10"></textarea>
+    </div>
+
+    <div>
+        <button type="submit">Send</button>
+    </div>
+</form>
+
+<form action="/V1/notes/update" method="post">
+    <div>
+        <label for="idForUpdate">Id:</label>
+        <input type="text" name="id" id="idForUpdate"/>
+    </div>
+
+    <div>
+        <label for="titleForUpdate">Title:</label>
+        <input type="text" name="title" id="titleForUpdate"/>
+    </div>
+
+    <div>
+        <label for="contentForUpdate">Content:</label>
+        <textarea name="content" id="contentForUpdate" cols="30" rows="10"></textarea>
+    </div>
+
+    <div>
+        <button type="submit">Send</button>
+    </div>
+</form>
+
+<form action="/V1/notes/delete" method="post">
+    <div>
+        <label for="id-for-delete">Id for delete:</label>
+        <input type="text" name="id" id="id-for-delete"/>
+    </div>
+
+    <div>
+        <button type="submit">Delete</button>
+    </div>
+</form>
+</body>
+</html>
