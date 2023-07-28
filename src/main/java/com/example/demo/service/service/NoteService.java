@@ -1,6 +1,7 @@
 package com.example.demo.service.service;
 
 import com.example.demo.service.dto.NoteDto;
+import com.example.demo.service.dto.NoteWithUsernameDto;
 import com.example.demo.service.exception.NoteNotFoundException;
 
 import java.util.Collection;
@@ -11,11 +12,14 @@ public interface NoteService {
 
     List<NoteDto> listAll();
 
+    List<NoteWithUsernameDto> listAllUserNotes(Long userId);
+    List<NoteWithUsernameDto> listAllUserNotes1(Long userId);
+
     NoteDto add(NoteDto note);
 
     List<NoteDto> addAll(Collection<NoteDto> notes);
 
-    void deleteById(UUID id) throws NoteNotFoundException;
+    void deleteById(UUID id, Long userId) throws NoteNotFoundException;
 
     void update(NoteDto note) throws NoteNotFoundException;
 

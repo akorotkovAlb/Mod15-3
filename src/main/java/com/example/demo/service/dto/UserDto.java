@@ -6,18 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteDto {
+public class UserDto {
 
-    private UUID id;
-    private Long userId;
-    private String title;
-    private String content;
+    private Long id;
+    private String username;
     private LocalDate lastUpdatedDate;
     private LocalDate createdDate;
 }

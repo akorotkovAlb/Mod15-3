@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,17 +38,20 @@ public class NoteControllerV1 {
 
     @RequestMapping(value = "/create", method = {RequestMethod.POST})
     public ModelAndView createNote(
+            @CookieValue(value = "userId") Long userId,
             @RequestParam(value="title") @Size(min = 1, max = 20) String title,
             @RequestParam(value="content") @NotBlank String content) {
         NoteDto dto = new NoteDto();
         dto.setTitle(title);
         dto.setContent(content);
+        dto.setUserId(userId);
         noteService.add(dto);
         return noteList();
     }
 
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public ModelAndView updateNote(
+            @CookieValue(value = "userId") Long userId,
             @NotNull @RequestParam(value="id") String id,
             @Size(min = 1, max = 250) @RequestParam(value="title") String title,
             @NotEmpty @RequestParam(value="content") String content) throws NoteNotFoundException {
@@ -55,14 +59,16 @@ public class NoteControllerV1 {
         dto.setId(UUID.fromString(id));
         dto.setTitle(title);
         dto.setContent(content);
+        dto.setUserId(userId);
         noteService.update(dto);
         return noteList();
     }
 
     @DeleteMapping("/delete")
     @RequestMapping(value = "/delete", method = {RequestMethod.POST})
-    public ModelAndView deleteNoteById(@Valid @NotNull @RequestParam(value="id") String id) throws NoteNotFoundException {
-        noteService.deleteById(UUID.fromString(id));
+    public ModelAndView deleteNoteById(@CookieValue(value = "userId") Long userId,
+                                       @Valid @NotNull @RequestParam(value="id") String id) throws NoteNotFoundException {
+        noteService.deleteById(UUID.fromString(id), userId);
         return noteList();
     }
 }

@@ -3,7 +3,9 @@ package com.example.demo.controller.controller;
 import com.example.demo.controller.request.V2.CreateNoteRequest;
 import com.example.demo.controller.request.V2.UpdateNoteRequest;
 import com.example.demo.controller.response.NoteResponse;
+import com.example.demo.data.projection.NoteWithUserNameProj;
 import com.example.demo.service.dto.NoteDto;
+import com.example.demo.service.dto.NoteWithUsernameDto;
 import com.example.demo.service.exception.NoteNotFoundException;
 import com.example.demo.service.mapper.NoteMapper;
 import com.example.demo.service.service.NoteService;
@@ -60,37 +62,42 @@ public class NoteControllerV2 {
                 .body(noteMapper.toNoteResponses(noteService.listAll()));
     }
 
+    @GetMapping("/user/list")
+    public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes(
+            @CookieValue(value = "userId") Long userId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(noteService.listAllUserNotes(userId));
+    }
+
+    @GetMapping("/user/1/list")
+    public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes1(
+            @CookieValue(value = "userId") Long userId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(noteService.listAllUserNotes1(userId));
+    }
+
     @PostMapping("/create")
-    public ResponseEntity<NoteResponse> createNote(@Valid @NotNull @RequestBody CreateNoteRequest request) {
-        NoteDto newNote = noteService.add(noteMapper.toNoteDto(request));
+    public ResponseEntity<NoteResponse> createNote(
+            @CookieValue(value = "userId") Long userId,
+            @Valid @NotNull @RequestBody CreateNoteRequest request) {
+        NoteDto noteDto = noteMapper.toNoteDto(request);
+        noteDto.setUserId(userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(noteMapper.toNoteResponse(newNote));
+                .body(noteMapper.toNoteResponse(noteService.add(noteDto)));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updateNote(
+            @CookieValue(value = "userId") Long userId,
             @PathVariable("id") UUID id,
             @RequestBody @Valid @NotNull UpdateNoteRequest request) throws NoteNotFoundException {
-        noteService.update(noteMapper.toNoteDto(id, request));
-    }
-
-    @PutMapping("/params/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void updateNoteFromRequestParams(
-            @RequestHeader(value = "test", required = false) String testValue,
-            @CookieValue(value = "cookies", required = false) String cookies,
-            @PathVariable("id") UUID id,
-            @RequestParam("title") @Valid @Size(min = 3, max = 250) String title,
-            @RequestParam("content") @Valid @NotBlank String content) throws NoteNotFoundException {
-        log.info("header ==> {}", testValue);
-        log.info("cookie ==> {}", cookies);
-        NoteDto dto = new NoteDto();
-        dto.setId(id);
-        dto.setTitle(title);
-        dto.setContent(content);
-        noteService.update(dto);
+        NoteDto noteDto = noteMapper.toNoteDto(id, request);
+        noteDto.setUserId(userId);
+        noteService.update(noteDto);
     }
 
     @GetMapping("/{id}")
@@ -104,12 +111,14 @@ public class NoteControllerV2 {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
-        noteService.deleteById(id);
+    public void deleteNoteById(@CookieValue(value = "userId") Long userId,
+                               @PathVariable("id") UUID id) throws NoteNotFoundException {
+        noteService.deleteById(id, userId);
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<List<NoteResponse>> uploadFromFile(@RequestPart("file") MultipartFile file)
+    public ResponseEntity<List<NoteResponse>> uploadFromFile(@CookieValue(value = "userId") Long userId,
+                                                             @RequestPart("file") MultipartFile file)
             throws IOException {
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf('.') + 1);
@@ -117,9 +126,11 @@ public class NoteControllerV2 {
             throw new FileUploadException(String.format(UPLOAD_FILE_EXCEPTION_TEXT, file.getOriginalFilename()));
         }
         byte[] bytes = file.getBytes();
-        List<CreateNoteRequest> notes = Arrays.asList(objectMapper.readValue(bytes, CreateNoteRequest[].class));
+        List<NoteDto> notes = noteMapper
+                .requestsToNoteDtos(Arrays.asList(objectMapper.readValue(bytes, CreateNoteRequest[].class)));
+        notes.forEach(note -> note.setUserId(userId));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(noteMapper.toNoteResponses(noteService.addAll(noteMapper.requestsToNoteDtos(notes))));
+                .body(noteMapper.toNoteResponses(noteService.addAll(notes)));
     }
 }
