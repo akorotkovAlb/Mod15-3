@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(Long userId, String oldUsername, String oldPassword,
                               String newUsername, String newPassword)
             throws UserNotFoundException, UserIncorrectPasswordException {

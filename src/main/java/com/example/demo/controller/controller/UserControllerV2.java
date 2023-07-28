@@ -66,9 +66,9 @@ public class UserControllerV2 {
 
     @PutMapping("/update")
     public ResponseEntity<UserResponse> updateUser(
-            @CookieValue(value = "userId", required = false) Long userId,
+            @CookieValue(value = "userId") Long userId,
             @Valid @NotNull @RequestBody UpdateUserRequest request)
-            throws UserAlreadyExistException, UserNotFoundException, UserIncorrectPasswordException {
+            throws UserNotFoundException, UserIncorrectPasswordException {
         UserDto newUser = userService.updateUser(userId, request.getOldUsername(), request.getOldPassword(),
                 request.getNewUsername(), request.getNewPassword());
         return ResponseEntity

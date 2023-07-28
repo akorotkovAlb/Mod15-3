@@ -12,6 +12,7 @@ import com.example.demo.service.service.NoteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -43,6 +44,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public NoteDto add(NoteDto note) {
         NoteEntity entity = noteMapper.toNoteEntity(note);
         entity.setId(null);
@@ -53,6 +55,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public List<NoteDto> addAll(Collection<NoteDto> notes) {
         Collection<NoteEntity> notesForSave = noteMapper.toNoteEntities(notes);
         notesForSave.forEach(note -> {
@@ -63,6 +66,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id, Long userId) throws NoteNotFoundException {
         NoteDto note = getById(id);
         if (!note.getUserId().equals(userId)) {
@@ -72,6 +76,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
+    @Transactional
     public void update(NoteDto note) throws NoteNotFoundException {
         if (Objects.isNull(note.getId())) {
             throw new NoteNotFoundException();
