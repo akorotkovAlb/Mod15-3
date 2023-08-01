@@ -1,16 +1,19 @@
-package com.example.demo.controller.request.V2;
+package com.example.demo.controller.request.V2.auth;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateUserRequest {
+public class LoginRequest {
 
+    @NotBlank
     @Size(min = 3, max = 100)
     private String username;
 
-    @Size(min = 3)
+    @NotBlank
+    @Size(min = 3, max = 100)
     private String password;
 }

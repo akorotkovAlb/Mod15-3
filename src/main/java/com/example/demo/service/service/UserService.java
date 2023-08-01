@@ -1,16 +1,21 @@
 package com.example.demo.service.service;
 
+import com.example.demo.service.dto.UpdateUserDto;
 import com.example.demo.service.dto.UserDto;
 import com.example.demo.service.exception.UserAlreadyExistException;
 import com.example.demo.service.exception.UserIncorrectPasswordException;
 import com.example.demo.service.exception.UserNotFoundException;
+import com.example.demo.utils.UserRole;
+
+import java.util.Collection;
 
 public interface UserService {
 
-    UserDto registrationUser(String username, String password) throws UserAlreadyExistException;
+    void registerUser(String username, String email,
+                      String password) throws UserAlreadyExistException;
 
-    UserDto login(String username, String password) throws UserNotFoundException, UserIncorrectPasswordException;
+    UserDto updateUser(Long userId, UpdateUserDto updateUserDto)
+            throws UserNotFoundException, UserIncorrectPasswordException, UserAlreadyExistException;
 
-    UserDto updateUser(Long userId, String oldUsername, String oldPassword,
-                       String newUsername, String newPassword) throws UserNotFoundException, UserIncorrectPasswordException;
+    UserDto updateUserRoles(Long userId, Collection<UserRole> roles) throws UserNotFoundException;
 }

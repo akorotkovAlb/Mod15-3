@@ -1,9 +1,9 @@
 package com.example.demo.controller.controller;
 
-import com.example.demo.controller.request.V2.CreateNoteRequest;
-import com.example.demo.controller.request.V2.UpdateNoteRequest;
+import com.example.demo.controller.config.jwt.UserDetailsImpl;
+import com.example.demo.controller.request.V2.note.CreateNoteRequest;
+import com.example.demo.controller.request.V2.note.UpdateNoteRequest;
 import com.example.demo.controller.response.NoteResponse;
-import com.example.demo.data.projection.NoteWithUserNameProj;
 import com.example.demo.service.dto.NoteDto;
 import com.example.demo.service.dto.NoteWithUsernameDto;
 import com.example.demo.service.exception.NoteNotFoundException;
@@ -11,26 +11,24 @@ import com.example.demo.service.mapper.NoteMapper;
 import com.example.demo.service.service.NoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,27 +61,32 @@ public class NoteControllerV2 {
     }
 
     @GetMapping("/user/list")
-    public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes(
-            @CookieValue(value = "userId") Long userId) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(noteService.listAllUserNotes(userId));
+                .body(noteService.listAllUserNotesWithProjection(authentication.getId()));
     }
 
-    @GetMapping("/user/1/list")
-    public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes1(
-            @CookieValue(value = "userId") Long userId) {
+    @GetMapping("/user/graph/list")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotesWithEntityGraph() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(noteService.listAllUserNotes1(userId));
+                .body(noteService.listAllUserNotesWithEntityGraph(authentication.getId()));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<NoteResponse> createNote(
-            @CookieValue(value = "userId") Long userId,
-            @Valid @NotNull @RequestBody CreateNoteRequest request) {
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<NoteResponse> createNote(@Valid @NotNull @RequestBody CreateNoteRequest request) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
         NoteDto noteDto = noteMapper.toNoteDto(request);
-        noteDto.setUserId(userId);
+        noteDto.setUserId(authentication.getId());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(noteMapper.toNoteResponse(noteService.add(noteDto)));
@@ -91,17 +94,20 @@ public class NoteControllerV2 {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public void updateNote(
-            @CookieValue(value = "userId") Long userId,
             @PathVariable("id") UUID id,
             @RequestBody @Valid @NotNull UpdateNoteRequest request) throws NoteNotFoundException {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
         NoteDto noteDto = noteMapper.toNoteDto(id, request);
-        noteDto.setUserId(userId);
+        noteDto.setUserId(authentication.getId());
         noteService.update(noteDto);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<NoteResponse> getNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
         NoteDto noteDto = noteService.getById(id);
         return ResponseEntity
@@ -111,15 +117,20 @@ public class NoteControllerV2 {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteNoteById(@CookieValue(value = "userId") Long userId,
-                               @PathVariable("id") UUID id) throws NoteNotFoundException {
-        noteService.deleteById(id, userId);
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public void deleteNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
+        noteService.deleteById(id, authentication.getId());
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<List<NoteResponse>> uploadFromFile(@CookieValue(value = "userId") Long userId,
-                                                             @RequestPart("file") MultipartFile file)
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<NoteResponse>> uploadFromFile(@RequestPart("file") MultipartFile file)
             throws IOException {
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
+
         String extension = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf('.') + 1);
         if (Objects.isNull(extension) || extension.isBlank() || !EXTENSION.equalsIgnoreCase(extension)) {
@@ -128,7 +139,7 @@ public class NoteControllerV2 {
         byte[] bytes = file.getBytes();
         List<NoteDto> notes = noteMapper
                 .requestsToNoteDtos(Arrays.asList(objectMapper.readValue(bytes, CreateNoteRequest[].class)));
-        notes.forEach(note -> note.setUserId(userId));
+        notes.forEach(note -> note.setUserId(authentication.getId()));
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(noteMapper.toNoteResponses(noteService.addAll(notes)));

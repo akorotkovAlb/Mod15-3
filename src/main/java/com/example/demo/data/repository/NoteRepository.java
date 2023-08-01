@@ -1,7 +1,7 @@
 package com.example.demo.data.repository;
 
 import com.example.demo.data.entity.NoteEntity;
-import com.example.demo.data.projection.NoteWithUserNameProj;
+import com.example.demo.data.projection.NoteWithUserNameProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,9 +18,9 @@ public interface NoteRepository extends JpaRepository<NoteEntity, UUID> {
             "SELECT n.id AS noteId, n.title, n.content, u.username " +
                     "FROM note n LEFT JOIN users u ON u.id = n.user_id " +
                     "WHERE u.id = :userId")
-    List<NoteWithUserNameProj> findWithUsername(@Param("userId") Long userId);
+    List<NoteWithUserNameProjection> findWithUsernameProjection(@Param("userId") Long userId);
 
     @EntityGraph(attributePaths = {"user"})
     @Query("FROM NoteEntity ne WHERE ne.user.id = :userId")
-    List<NoteEntity> findWithUser(@Param("userId") Long userId);
+    List<NoteEntity> findWithUsernameEntityGraph(@Param("userId") Long userId);
 }

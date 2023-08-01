@@ -1,4 +1,4 @@
-package com.example.demo.controller.request.V2;
+package com.example.demo.controller.request.V2.note;
 
 import lombok.Getter;
 import lombok.Setter;

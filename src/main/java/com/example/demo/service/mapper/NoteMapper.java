@@ -1,11 +1,10 @@
 package com.example.demo.service.mapper;
 
-import com.example.demo.controller.request.V2.CreateNoteRequest;
-import com.example.demo.controller.request.V2.UpdateNoteRequest;
+import com.example.demo.controller.request.V2.note.CreateNoteRequest;
+import com.example.demo.controller.request.V2.note.UpdateNoteRequest;
 import com.example.demo.controller.response.NoteResponse;
 import com.example.demo.data.entity.NoteEntity;
-import com.example.demo.data.entity.UserEntity;
-import com.example.demo.data.projection.NoteWithUserNameProj;
+import com.example.demo.data.projection.NoteWithUserNameProjection;
 import com.example.demo.service.dto.NoteDto;
 import com.example.demo.service.dto.NoteWithUsernameDto;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ public class NoteMapper {
         entity.setId(dto.getId());
         entity.setTitle(dto.getTitle());
         entity.setContent(dto.getContent());
-        entity.setUser(new UserEntity(dto.getUserId()));
+//        entity.setUser(new UserEntity(dto.getUserId()));
         entity.setLastUpdatedDate(dto.getLastUpdatedDate());
         return entity;
     }
@@ -86,7 +85,7 @@ public class NoteMapper {
         return dto;
     }
 
-    public NoteWithUsernameDto toNoteWithUsernameDto(NoteWithUserNameProj proj) {
+    public NoteWithUsernameDto toNoteWithUsernameDto(NoteWithUserNameProjection proj) {
         NoteWithUsernameDto dto = new NoteWithUsernameDto();
         dto.setId(proj.getNoteId());
         dto.setTitle(proj.getTitle());
@@ -95,7 +94,7 @@ public class NoteMapper {
         return dto;
     }
 
-    public List<NoteWithUsernameDto> toNoteWithUsernameDtoList(Collection<NoteWithUserNameProj> projs) {
+    public List<NoteWithUsernameDto> toNoteWithUsernameDtoList(Collection<NoteWithUserNameProjection> projs) {
         return projs.stream().map(this::toNoteWithUsernameDto).toList();
     }
 

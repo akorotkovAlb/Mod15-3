@@ -12,8 +12,8 @@ public interface NoteService {
 
     List<NoteDto> listAll();
 
-    List<NoteWithUsernameDto> listAllUserNotes(Long userId);
-    List<NoteWithUsernameDto> listAllUserNotes1(Long userId);
+    List<NoteWithUsernameDto> listAllUserNotesWithProjection(Long userId);
+    List<NoteWithUsernameDto> listAllUserNotesWithEntityGraph(Long userId);
 
     NoteDto add(NoteDto note);
 
