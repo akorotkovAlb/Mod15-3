@@ -1,6 +1,7 @@
 package com.example.demo.service.service.impl;
 
 import com.example.demo.data.entity.NoteEntity;
+import com.example.demo.data.entity.UserEntity;
 import com.example.demo.data.repository.NoteRepository;
 import com.example.demo.service.dto.NoteDto;
 import com.example.demo.service.dto.NoteWithUsernameDto;
@@ -46,7 +47,7 @@ public class NoteServiceImpl implements NoteService {
     public NoteDto add(NoteDto note) {
         NoteEntity entity = noteMapper.toNoteEntity(note);
         entity.setId(null);
-//        entity.setUser(new UserEntity(note.getUserId()));
+        entity.setUser(new UserEntity(note.getUserId()));
         entity.setCreatedDate(LocalDate.now());
         entity.setLastUpdatedDate(LocalDate.now());
         return noteMapper.toNoteDto(noteRepository.save(entity));

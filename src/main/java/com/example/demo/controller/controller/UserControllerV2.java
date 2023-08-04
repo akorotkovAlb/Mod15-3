@@ -34,7 +34,7 @@ public class UserControllerV2 {
     @Autowired private UserMapper userMapper;
 
     @PutMapping("/update")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest)
             throws UserNotFoundException, UserAlreadyExistException, UserIncorrectPasswordException {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -44,7 +44,7 @@ public class UserControllerV2 {
     }
 
     @PutMapping("/update/roles")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<UserResponse> updateUserRole(@Valid @RequestBody UpdateUserRoleRequest updateUserRoleRequest)
             throws UserNotFoundException {
         SecurityContext context = SecurityContextHolder.getContext();

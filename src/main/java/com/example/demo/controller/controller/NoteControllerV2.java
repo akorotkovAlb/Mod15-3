@@ -61,7 +61,7 @@ public class NoteControllerV2 {
     }
 
     @GetMapping("/user/list")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes() {
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
@@ -71,7 +71,7 @@ public class NoteControllerV2 {
     }
 
     @GetMapping("/user/graph/list")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotesWithEntityGraph() {
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
@@ -81,7 +81,7 @@ public class NoteControllerV2 {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<NoteResponse> createNote(@Valid @NotNull @RequestBody CreateNoteRequest request) {
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
@@ -94,7 +94,7 @@ public class NoteControllerV2 {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public void updateNote(
             @PathVariable("id") UUID id,
             @RequestBody @Valid @NotNull UpdateNoteRequest request) throws NoteNotFoundException {
@@ -107,7 +107,7 @@ public class NoteControllerV2 {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<NoteResponse> getNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
         NoteDto noteDto = noteService.getById(id);
         return ResponseEntity
@@ -117,7 +117,7 @@ public class NoteControllerV2 {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public void deleteNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetailsImpl authentication = (UserDetailsImpl) context.getAuthentication().getPrincipal();
@@ -125,7 +125,7 @@ public class NoteControllerV2 {
     }
 
     @PostMapping("/upload")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<List<NoteResponse>> uploadFromFile(@RequestPart("file") MultipartFile file)
             throws IOException {
         SecurityContext context = SecurityContextHolder.getContext();
