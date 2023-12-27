@@ -31,7 +31,7 @@ ALTER TABLE public.note ADD CONSTRAINT note_fk FOREIGN KEY (user_id) REFERENCES 
 ALTER TABLE public.user_roles ADD CONSTRAINT user_role_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 ALTER TABLE public.user_roles ADD CONSTRAINT role_user_fk FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE;
 
-INSERT INTO public.roles (name) VALUES ('SUPER_ADMIN'), ('ADMIN'), ('USER');
+INSERT INTO public.roles (name) VALUES ('SUPER_ADMIN'), ('ADMIN'), ('USER'), ('USER1');
 
 INSERT INTO public.users (username, password, email, last_updated_date, created_date)
 VALUES ('admin', '$2a$10$.IeRI/Gy/8UscmtMmMHyDe2PDe0TMLn.9vb6WUSS2FVtzGmEZzcj2', 'admin@gmail.com', NOW(), NOW()),
