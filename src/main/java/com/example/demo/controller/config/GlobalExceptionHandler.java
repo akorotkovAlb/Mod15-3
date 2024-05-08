@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Collections;
@@ -23,6 +24,7 @@ import static java.util.Arrays.asList;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, Map<String, List<String>>>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, List<String>> result = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
@@ -40,11 +42,13 @@ public class GlobalExceptionHandler {
             NoteNotFoundException.class,
             UserNotFoundException.class
     })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, List<String>>> noteNotFoundException(Exception ex) {
         return getErrorsMap(ex, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = {FileUploadException.class})
+    @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
     public ResponseEntity<Map<String, List<String>>> fileUploadException(FileUploadException ex) {
         return getErrorsMap(ex, HttpStatus.I_AM_A_TEAPOT);
     }
