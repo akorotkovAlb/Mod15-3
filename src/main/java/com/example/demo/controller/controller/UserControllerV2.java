@@ -10,6 +10,7 @@ import com.example.demo.service.exception.UserIncorrectPasswordException;
 import com.example.demo.service.exception.UserNotFoundException;
 import com.example.demo.service.mapper.UserMapper;
 import com.example.demo.service.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Validated
-@Controller
+@RestController
 @RequestMapping("/V2/users")
 public class UserControllerV2 {
 
@@ -34,6 +36,7 @@ public class UserControllerV2 {
     @Autowired private UserMapper userMapper;
 
     @PutMapping("/update")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest)
             throws UserNotFoundException, UserAlreadyExistException, UserIncorrectPasswordException {
@@ -44,6 +47,7 @@ public class UserControllerV2 {
     }
 
     @PutMapping("/update/roles")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<UserResponse> updateUserRole(@Valid @RequestBody UpdateUserRoleRequest updateUserRoleRequest)
             throws UserNotFoundException {

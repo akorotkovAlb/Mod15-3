@@ -10,6 +10,7 @@ import com.example.demo.service.exception.NoteNotFoundException;
 import com.example.demo.service.mapper.NoteMapper;
 import com.example.demo.service.service.NoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -41,7 +43,7 @@ import java.util.UUID;
 
 @Slf4j
 @Validated
-@Controller
+@RestController
 @RequestMapping("/V2/notes")
 public class NoteControllerV2 {
 
@@ -61,6 +63,7 @@ public class NoteControllerV2 {
     }
 
     @GetMapping("/user/list")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotes() {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -71,6 +74,7 @@ public class NoteControllerV2 {
     }
 
     @GetMapping("/user/graph/list")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<List<NoteWithUsernameDto>> getAllUserNotesWithEntityGraph() {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -81,6 +85,7 @@ public class NoteControllerV2 {
     }
 
     @PostMapping("/create")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<NoteResponse> createNote(@Valid @NotNull @RequestBody CreateNoteRequest request) {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -94,6 +99,7 @@ public class NoteControllerV2 {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public void updateNote(
             @PathVariable("id") UUID id,
@@ -107,6 +113,7 @@ public class NoteControllerV2 {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<NoteResponse> getNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
         NoteDto noteDto = noteService.getById(id);
@@ -117,6 +124,7 @@ public class NoteControllerV2 {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public void deleteNoteById(@PathVariable("id") UUID id) throws NoteNotFoundException {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -125,6 +133,7 @@ public class NoteControllerV2 {
     }
 
     @PostMapping("/upload")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN') or hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<List<NoteResponse>> uploadFromFile(@RequestPart("file") MultipartFile file)
             throws IOException {
